@@ -1,238 +1,250 @@
+# HLR HTTP(s) API
 
-
-# HLR HTTP(s) API (Get, Post Method)
-
-This page provides a reference for all features available to you via the HTTP interface for HLR query.
+This page provides a detailed reference for all features available via the HTTP interface for HLR (Home Location Register) queries.
 
 ## Overview
 
-The [HTTP-API](https://easysendsms.com) allows you to integrate your system (client) to [EasySendSMS](https://easysendsms.com) using the HTTP protocol to request HLR. HTTPS is also supported for secure transactions using SSL encryption.
+The HTTP API allows you to integrate your system (client) with [EasySendSMS](https://easysendsms.com) using the HTTP or HTTPS protocols to request HLR lookups securely with SSL encryption.
 
-The Client issues either a GET or POST request to the [EasySendSMS HTTP API](https://easysendsms.com) supplying a list of required parameters. Our system issues back an HTTP response in JSON format which indicates the status of the number, such as the status, MCC, MNC, and Ported.
+The client issues either a GET or POST request to the EasySendSMS HTTP API, supplying the required parameters. Our system responds with a JSON-format HTTP response that indicates the status of the number, including details such as status, MCC, MNC, and whether the number is ported.
 
-With an HLR Lookup, you can clean your data lists or check the status of a phone before sending an SMS. This can save money on delivery for both Bulk SMS campaigns as well as Single SMS messages. HLR Lookup is more commonly used by SMS Service Providers for Mobile Number Portability enquiries to obtain MCC and MNC (IMSI) information.
+Using an HLR Lookup, you can clean your data lists or check the status of a phone number before sending an SMS. This can help save costs on delivery for both Bulk SMS campaigns and single SMS messages. HLR Lookup is commonly used by SMS Service Providers for Mobile Number Portability enquiries to obtain MCC and MNC (IMSI) information.
 
-Our [HLR Lookup tool](https://easysendsms.com) allows users to perform bulk checking of up to 30 numbers at once by separating them with commas. This feature saves time and enhances efficiency, making it ideal for businesses and individuals who need to verify multiple phone numbers quickly. By integrating our HLR API, you can seamlessly incorporate this functionality into your application, ensuring accurate and up-to-date information on number status.
+Our HLR Lookup tool also allows users to perform bulk checks of up to 30 numbers at once by separating them with commas. This feature saves time and enhances efficiency, making it ideal for businesses and individuals who need to verify multiple phone numbers quickly. By integrating our HLR API, you can seamlessly incorporate this functionality into your application, ensuring accurate and up-to-date information on number status.
 
-## Important Notes
-
-- If you have set a dedicated API Password different from the account password, make sure to use it.
-
+> **Note:**
+> - 🔐 **API Password:** If you have set a dedicated API password (different from your account password), make sure you are using the correct one in your request.
+> - 🌐 **IP Whitelisting:** If API IP whitelisting is enabled, ensure your request is sent from an authorized IP address. Requests from non-whitelisted IPs will be rejected.
+> - ⚠️ **URL Encoding Required:** All API parameters must be properly URL-encoded before sending the request. Special characters like `&`, `%`, `+`, or spaces can break the request if not encoded correctly.
 
 ## API Base URL
 
-```
+```http
 https://api.easysendsms.app/hlr
 ```
 
-## API Parameters
+**Method:** `GET`, `POST`
 
-| Parameter | Description                                                                 | Presence   |
-|-----------|-----------------------------------------------------------------------------|------------|
-| Username  | Your [EasySendSMS](https://easysendsms.com) username                        | Mandatory  |
-| Password  | Your [EasySendSMS](https://easysendsms.com) account password or your API password (if you set it in your account settings) | Mandatory  |
-| Number    | Subscriber MSISDN to check.                                                 | Mandatory  |
+## Required Parameters
+
+The following parameters must be included in your API request:
+
+| Parameter | Description | Required |
+| :--- | :--- | :--- |
+| **Username** | Your EasySendSMS username. | Yes |
+| **Password** | Your EasySendSMS account password or your API password (if set in your account settings). | Yes |
+| **Number** | The subscriber's MSISDN (mobile number) to check. | Yes |
 
 ## HTTP Response
 
-The HTTP response from our system contains the following:
+The HTTP response from our system will contain the following information in JSON format.
 
-### Response JSON Format
-
-If the HLR query has been sent successfully, the status code will return as below:
+If the HLR query is successful, the response will be returned as follows:
 
 **Example:**
-
 ```json
 {
     "33644444444": {
-       "number": "33644444444",
-       "country": "France",
-       "err_desc": "Dead",
-       "operator": "Transatel",
-       "type": "Mobile",
-       "mccmnc": "",
-       "roaming": "False",
-       "err_code": "1",
-       "status": "Undelivered",
-       "ported": "False"
-     }
-  }
+        "number": "33644444444",
+        "country": "France",
+        "err_desc": "Dead",
+        "operator": "Transatel",
+        "type": "Mobile",
+        "mccmnc": "",
+        "roaming": "False",
+        "err_code": "1",
+        "status": "Undelivered",
+        "ported": "False"
+    }
+}
 ```
 
-If the HLR query is incorrect, it will return `ERROR: {Error description}`
+If the HLR query fails, the response will return **ERROR: {Error description}**.
 
 **Example:**
-
 ```json
 {"error":"Authentication failed"}
 ```
 
-### Example Queries
+## Example GET Requests
 
-**Single HLR Query Example:**
+Below are examples of GET requests using the HTTP interface.  
+*(Ensure all parameter values are URL-encoded)*
 
-- **Username**: testuser
-- **Password**: secret
-- **Number**: 33644444444
+### Single HLR Query Example
 
 **Request URL:**
-
-```
+```http
 https://api.easysendsms.app/hlr?username=testuser&password=secret&number=33644444444
 ```
 
 **Output:**
-
 ```json
 {
-  "33644444444": {
-     "number": "33644444444",
-     "country": "France",
-     "err_desc": "Dead",
-     "operator": "Transatel",
-     "type": "Mobile",
-     "mccmnc": "",
-     "roaming": "False",
-     "err_code": "1",
-     "status": "Undelivered",
-     "ported": "False"
-   }
+    "33644444444": {
+        "number": "33644444444",
+        "country": "France",
+        "err_desc": "Dead",
+        "operator": "Transatel",
+        "type": "Mobile",
+        "mccmnc": "",
+        "roaming": "False",
+        "err_code": "1",
+        "status": "Undelivered",
+        "ported": "False"
+    }
 }
 ```
 
-**Bulk HLR Query Example (Max 30 numbers per request):**
+### Bulk HLR Query Example (Max 30 numbers)
 
 **Request URL:**
-
-```
-https://api.easysendsms.app/hlr?username=testuser&password=secret&number=33644444444,33644444444
+```http
+https://api.easysendsms.app/hlr?username=testuser&password=secret&number=33644444444,33644444445
 ```
 
 **Output:**
-
 ```json
 {
-  "33644444444": {
-    "number": "33644444444",
-    "country": "France",
-    "err_desc": "Dead",
-    "operator": "Transatel",
-    "type": "Mobile",
-    "mccmnc": "",
-    "roaming": "False",
-    "err_code": "1",
-    "status": "Undelivered",
-    "ported": "False"
-  },
-  "33644444445": {
-    "number": "33644444445",
-    "country": "France",
-    "err_desc": "Dead",
-    "operator": "Transatel",
-    "type": "Mobile",
-    "mccmnc": "",
-    "roaming": "False",
-    "err_code": "1",
-    "status": "Undelivered",
-    "ported": "False"
-  }
+    "33644444444": {
+        "number": "33644444444",
+        "country": "France",
+        "err_desc": "Dead",
+        "operator": "Transatel",
+        "type": "Mobile",
+        "mccmnc": "",
+        "roaming": "False",
+        "err_code": "1",
+        "status": "Undelivered",
+        "ported": "False"
+    },
+    "33644444445": {
+        "number": "33644444445",
+        "country": "France",
+        "err_desc": "Dead",
+        "operator": "Transatel",
+        "type": "Mobile",
+        "mccmnc": "",
+        "roaming": "False",
+        "err_code": "1",
+        "status": "Undelivered",
+        "ported": "False"
+    }
 }
 ```
 
+## HLR Response Fields
+
+The following table outlines the possible fields returned in the HLR response:
+
+| Field | Description |
+| :--- | :--- |
+| **number** | The subscriber's MSISDN to check. |
+| **country** | The subscriber's network country. |
+| **err_desc** | Description of the status of the number. Possible values include:<br>• Live<br>• Dead<br>• Inconclusive<br>• No Teleservice Provisioned<br>• Absent Subscriber |
+| **operator** | The subscriber's mobile network operator. |
+| **type** | The type of number (e.g., Mobile, Fixed). |
+| **mccmnc** | The actual MCC and MNC of the subscriber. |
+| **roaming** | Indicates whether the subscriber number is currently roaming. |
+| **err_code** | Error code corresponding to the `err_desc`. Possible values include:<br>• `0` = Active mobile number<br>• `1` = Number decommissioned by the owning network<br>• `5` = Unable to retrieve a response from the network for this number<br>• `11` = Number unable to receive calls or SMS messages (e.g., data SIM)<br>• `27` = Absent Subscriber |
+| **status** | The status of the number. This field is linked with `err_code` and `err_desc`. Possible values include:<br>• Delivered<br>• Undelivered |
+
 ## API Rate Limit
 
-To maintain a high quality of service to all customers, the [EasySendSMS API](https://easysendsms.com) applies rate limits for its HLR API. The default request rate limit is 30 requests per second per account per IP address. The API will reject all requests exceeding this rate limit with a `429 Too Many Requests` HTTP Status.
+To maintain a high quality of service, EasySendSMS API enforces rate limits for its HLR API.
+
+The default request rate limit is 30 requests per second per account per IP address. The API will reject requests exceeding this limit with a `429 Too Many Requests` HTTP status.
 
 You can retry the request after 1 second.
 
-## HLR Response
+## HLR API Error Codes
 
-| Value     | Description                                                                                 |
-|-----------|---------------------------------------------------------------------------------------------|
-| number    | Subscriber MSISDN to check.                                                                  |
-| country   | The Subscriber's network country.                                                            |
-| err_desc  | If there is an error, otherwise will show "Live" if the number is active. Error description can be one of the following: Live, Dead, Inconclusive, No Teleservice Provisioned, Absent Subscriber |
-| operator  | The Subscriber's mobile network operator.                                                    |
-| type      | Number type like Mobile, Fixed.                                                              |
-| mccmnc    | Actual MCC and MNC of a subscriber.                                                          |
-| roaming   | Indicates if the subscriber number is currently roaming.                                     |
-| err_code  | Anything marked as Live in `err_desc` will always have an Error Code of 1. Error code can be one of the following: 0=Active mobile number, 1=Number decommissioned by the owning network, 5=Unable to retrieve a response from the network, 11=This number cannot receive calls or SMS messages, 27=Absent Subscriber. |
-| status    | Number status.                                                                               |
+The following table outlines possible error codes you may encounter:
 
-`error_code`, `err_desc`, and `status` are all linked, and you can use any of these fields. `status` can be one of the following states:
+| Error Text | Description |
+| :--- | :--- |
+| **Invalid Number Parameter** | Invalid Number. This means the parameter was not provided or was left blank. |
+| **Invalid Password Parameter** | Invalid password. This means the parameter was not provided or was left blank. |
+| **Invalid Username Parameter** | Invalid username. This means the parameter was not provided or was left blank. |
+| **Authentication failed** | Invalid username or password, or account not active or does not exist. |
+| **Insufficient credits** | HLR lookup account has insufficient credits. |
+| **Http Error Code: 429** | API calls quota exceeded! Maximum allowed is 30 requests per second. |
 
-- Delivered
-- Undelivered
+## HLR Code Examples
 
-## API Error Codes
+Below are examples of calling the HLR API using various programming languages.
 
-| Error Text                     | Description                                                                                       |
-|--------------------------------|---------------------------------------------------------------------------------------------------|
-| Invalid Number Parameter       | Invalid Number. This means the parameter was not provided or left blank.                          |
-| Invalid Password Parameter     | Invalid password. This means the parameter was not provided or left blank.                       |
-| Invalid Username Parameter     | Invalid username. This means the parameter was not provided or left blank.                       |
-| Authentication failed          | Invalid username or password, or account not active or existing.                                 |
-| Insufficient credits           | HLR lookup account has insufficient credits.                                                      |
-| Http Error Code: 429           | API calls quota exceeded! Maximum allowed is 30 per second.                                       |
+### 🟢 .NET
+[Direct Link to Example](#net)
 
+```csharp
+var options = new RestClientOptions("")
+{
+    MaxTimeout = -1,
+};
 
-
-### Call The API By Code
-
-## .NET:
+var client = new RestClient(options);
+var request = new RestRequest("https://api.easysendsms.app/hlr", Method.Post);
+request.AddHeader("Content-Type", "application/x-www-form-urlencoded");
+request.AddParameter("username", "username");
+request.AddParameter("password", "password");
+request.AddParameter("number", "12345678900");
+RestResponse response = await client.ExecuteAsync(request);
+Console.WriteLine(response.Content);
 ```
-        var options = new RestClientOptions("")
-        {
-        MaxTimeout = -1,
-        };
-        var client = new RestClient(options);
-        var request = new RestRequest("https://api.easysendsms.app/hlr", Method.Post);
-        request.AddHeader("Content-Type", "application/x-www-form-urlencoded");
-        request.AddHeader("Cookie", "ASPSESSIONIDASCQBARR=NKOHDCHDOFEOOALJIGDGGPAM; ASPSESSIONIDQSSDABDR=GBMPKKKDOBIPGBAMEHKNDAIE;        
-        ASPSESSIONIDSSRDDBDQ=BDOPELKDNCOINCJKFIADJAKA");
-        request.AddParameter("username", "username");
-        request.AddParameter("password", "password");
-        request.AddParameter("number", "12345678900");
-        RestResponse response = await client.ExecuteAsync(request);
-        Console.WriteLine(response.Content);
-```
-## PHP:
-```
-        $curl = curl_init();
 
-        curl_setopt_array($curl, array(
-        CURLOPT_URL => 'https://api.easysendsms.app/hlr',
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_ENCODING => '',
-        CURLOPT_MAXREDIRS => 10,
-        CURLOPT_TIMEOUT => 0,
-        CURLOPT_FOLLOWLOCATION => true,
-        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-        CURLOPT_CUSTOMREQUEST => 'POST',
-        CURLOPT_POSTFIELDS => 'username=username&password=password&number=12345678900',
-        CURLOPT_HTTPHEADER => array(
-            'Content-Type: application/x-www-form-urlencoded',
-            'Cookie: ASPSESSIONIDASCQBARR=NKOHDCHDOFEOOALJIGDGGPAM; ASPSESSIONIDQSSDABDR=GBMPKKKDOBIPGBAMEHKNDAIE; ASPSESSIONIDSSRDDBDQ=BDOPELKDNCOINCJKFIADJAKA'
-        ),
-        ));
+### 🐘 PHP
+[Direct Link to Example](#php)
 
-        $response = curl_exec($curl);
+```php
+$curl = curl_init();
 
-        curl_close($curl);
-        echo $response;
-    
+curl_setopt_array($curl, array(
+    CURLOPT_URL => 'https://api.easysendsms.app/hlr',
+    CURLOPT_RETURNTRANSFER => true,
+    CURLOPT_ENCODING => '',
+    CURLOPT_MAXREDIRS => 10,
+    CURLOPT_TIMEOUT => 0,
+    CURLOPT_FOLLOWLOCATION => true,
+    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+    CURLOPT_CUSTOMREQUEST => 'POST',
+    CURLOPT_POSTFIELDS => 'username=username&password=password&number=12345678900',
+    CURLOPT_HTTPHEADER => array(
+        'Content-Type: application/x-www-form-urlencoded'
+    ),
+));
+
+$response = curl_exec($curl);
+curl_close($curl);
+echo $response;
 ```
-## JAVA:
+
+### ☕ Java
+[Direct Link to Example](#java)
+
+```java
+Unirest.setTimeouts(0, 0);
+HttpResponse<String> response = Unirest.post("https://api.easysendsms.app/hlr")
+    .header("Content-Type", "application/x-www-form-urlencoded")
+    .field("username", "username")
+    .field("password", "password")
+    .field("number", "12345678900")
+    .asString();
 ```
-        Unirest.setTimeouts(0, 0);
-        HttpResponse response = Unirest.post("https://api.easysendsms.app/hlr")
-        .header("Content-Type", "application/x-www-form-urlencoded")
-        .header("Cookie", "ASPSESSIONIDASCQBARR=NKOHDCHDOFEOOALJIGDGGPAM; ASPSESSIONIDQSSDABDR=GBMPKKKDOBIPGBAMEHKNDAIE; 
-        ASPSESSIONIDSSRDDBDQ=BDOPELKDNCOINCJKFIADJAKA")
-        .field("username", "username")
-        .field("password", "password")
-        .field("number", "12345678900")
-        .asString();
-    
+
+### 🐍 Python
+[Direct Link to Example](#python)
+
+```python
+import http.client
+
+conn = http.client.HTTPSConnection("api.easysendsms.app")
+payload = 'username=username&password=password&number=12345678900'
+headers = {
+    'Content-Type': 'application/x-www-form-urlencoded'
+}
+conn.request("POST", "/hlr", payload, headers)
+res = conn.getresponse()
+data = res.read()
+print(data.decode("utf-8"))
 ```
